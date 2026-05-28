@@ -7,7 +7,6 @@ import {
   Settings, 
   LogOut, 
   LogIn, 
-  User, 
   Cpu, 
   ChevronLeft, 
   ChevronRight, 
@@ -40,7 +39,19 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
     if (setIsMobileOpen) setIsMobileOpen(false);
   };
 
-  // Get initials for profile avatar
+  // Determine active workspace dynamically from the route path
+  const getActiveWorkspace = () => {
+    if (location.pathname.includes('calculo-diferencial')) {
+      return { id: 'CD', name: 'Cálculo Diferencial', iconText: 'CD', desc: 'Límites y Derivadas' };
+    }
+    if (location.pathname.includes('fisica-matematica')) {
+      return { id: 'FM', name: 'Física Matemática', iconText: 'FM', desc: 'Campos y Ondas' };
+    }
+    return { id: 'AC', name: 'Álgebra y Cálculo', iconText: 'AC', desc: 'Espacio Local' };
+  };
+
+  const activeWorkspace = getActiveWorkspace();
+
   const getInitials = (name) => {
     if (!name) return 'IN';
     return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
@@ -84,7 +95,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
           {/* Desktop collapse button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden md:flex p-1 rounded-md text-slate-500 hover:text-slate-200 hover:bg-white/5"
+            className="hidden md:flex p-1 rounded-md text-zinc-500 hover:text-zinc-200 hover:bg-white/5 cursor-pointer"
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
@@ -99,25 +110,46 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
             >
               <div className="flex items-center space-x-2.5 overflow-hidden">
                 <div className="h-5 w-5 bg-accent-purple/20 border border-accent-purple/40 rounded flex items-center justify-center shrink-0">
-                  <span className="text-[10px] font-bold text-accent-purple">C1</span>
+                  <span className="text-[10px] font-bold text-accent-purple">{activeWorkspace.iconText}</span>
                 </div>
                 <div className="leading-tight truncate">
-                  <span className="text-xs font-semibold text-slate-200 block truncate">Álgebra y Cálculo</span>
-                  <span className="text-[9px] text-slate-500 block">Espacio Local</span>
+                  <span className="text-xs font-semibold text-slate-200 block truncate">{activeWorkspace.name}</span>
+                  <span className="text-[9px] text-zinc-500 block">{activeWorkspace.desc}</span>
                 </div>
               </div>
-              <ChevronsUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+              <ChevronsUpDown className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
             </button>
 
             {showWorkspaceMenu && (
               <div className="absolute top-full left-3 right-3 mt-1.5 p-1 rounded-lg bg-[#0e0e16] border border-white/10 shadow-2xl z-50 space-y-0.5 animate-slideDown">
-                <span className="text-[9px] font-bold text-slate-500 block px-2 py-1 tracking-wider uppercase">Mis Espacios</span>
-                <button className="w-full text-left text-xs text-slate-300 hover:text-white p-2 hover:bg-white/5 rounded transition">
-                  🏫 Cálculo Diferencial
-                </button>
-                <button className="w-full text-left text-xs text-slate-300 hover:text-white p-2 hover:bg-white/5 rounded transition">
-                  📐 Física Matemática
-                </button>
+                <span className="text-[9px] font-bold text-zinc-500 block px-2 py-1 tracking-wider uppercase">Mis Espacios</span>
+                
+                <Link
+                  to="/"
+                  onClick={() => { setShowWorkspaceMenu(false); handleLinkClick(); }}
+                  className="w-full text-left text-xs text-zinc-300 hover:text-white p-2 hover:bg-white/5 rounded transition flex items-center space-x-2"
+                >
+                  <span>🧮</span>
+                  <span>Álgebra y Cálculo</span>
+                </Link>
+
+                <Link
+                  to="/workspace/calculo-diferencial"
+                  onClick={() => { setShowWorkspaceMenu(false); handleLinkClick(); }}
+                  className="w-full text-left text-xs text-zinc-300 hover:text-white p-2 hover:bg-white/5 rounded transition flex items-center space-x-2"
+                >
+                  <span>🏫</span>
+                  <span>Cálculo Diferencial</span>
+                </Link>
+
+                <Link
+                  to="/workspace/fisica-matematica"
+                  onClick={() => { setShowWorkspaceMenu(false); handleLinkClick(); }}
+                  className="w-full text-left text-xs text-zinc-300 hover:text-white p-2 hover:bg-white/5 rounded transition flex items-center space-x-2"
+                >
+                  <span>📐</span>
+                  <span>Física Matemática</span>
+                </Link>
               </div>
             )}
           </div>
@@ -126,26 +158,43 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         {/* Navigation items section */}
         <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
           {navLinks.map((link) => {
-            if (link.requireAuth && !isAuthenticated) return null;
             const Icon = link.icon;
-            const active = isActive(link.path);
+            
+            // Highlight dashboard path correctly when in specific workspaces
+            const active = link.path === '/' 
+              ? (location.pathname === '/' || location.pathname.startsWith('/workspace/'))
+              : isActive(link.path);
+
+            const isLocked = link.requireAuth && !isAuthenticated;
 
             return (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={handleLinkClick}
-                className={`flex items-center rounded-lg p-2.5 text-sm font-medium transition-all group duration-150 ${
+                className={`flex items-center rounded-lg p-2.5 text-sm font-medium transition-all group duration-150 relative ${
                   isCollapsed ? 'justify-center' : 'space-x-3'
                 } ${
                   active
                     ? 'sidebar-item-active text-white'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                 }`}
-                title={isCollapsed ? link.name : ''}
+                title={isCollapsed ? (isLocked ? `${link.name} (Requiere Cuenta)` : link.name) : ''}
               >
-                <Icon className={`h-4.5 w-4.5 shrink-0 ${active ? 'text-accent-blue' : 'text-slate-400 group-hover:text-slate-200'}`} />
-                {!isCollapsed && <span>{link.name}</span>}
+                <Icon className={`h-4.5 w-4.5 shrink-0 ${active ? 'text-accent-blue' : 'text-zinc-400 group-hover:text-zinc-200'}`} />
+                {!isCollapsed && (
+                  <div className="flex items-center justify-between w-full">
+                    <span>{link.name}</span>
+                    {isLocked && (
+                      <span className="text-[9px] font-bold text-zinc-600 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 uppercase">
+                        Bloqueado
+                      </span>
+                    )}
+                  </div>
+                )}
+                {isCollapsed && isLocked && (
+                  <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-accent-purple rounded-full"></div>
+                )}
               </Link>
             );
           })}
@@ -162,7 +211,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
                 {!isCollapsed && (
                   <div className="leading-tight truncate">
                     <span className="text-xs font-semibold text-slate-200 block truncate">{user?.nombre}</span>
-                    <span className="text-[9px] text-slate-500 block truncate">{user?.correo}</span>
+                    <span className="text-[9px] text-zinc-500 block truncate">{user?.correo}</span>
                   </div>
                 )}
               </div>
@@ -180,7 +229,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
           ) : (
             <div className="space-y-2">
               {!isCollapsed && (
-                <div className="flex items-center space-x-1.5 text-[9px] font-semibold text-slate-500 bg-white/5 p-1.5 rounded border border-white/5 justify-center">
+                <div className="flex items-center space-x-1.5 text-[9px] font-semibold text-zinc-500 bg-white/5 p-1.5 rounded border border-white/5 justify-center">
                   <BookOpen className="h-3 w-3 text-accent-purple" />
                   <span>MODO INVITADO ACTIVO</span>
                 </div>

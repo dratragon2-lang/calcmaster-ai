@@ -57,7 +57,7 @@ function AppContent() {
         </div>
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-white/5"
+          className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-white/5 cursor-pointer"
         >
           <Menu className="h-6 w-6" />
         </button>
@@ -72,6 +72,7 @@ function AppContent() {
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/workspace/:workspaceId" element={<Dashboard />} />
               <Route path="/login" element={<Login />} />
               <Route 
                 path="/history" 

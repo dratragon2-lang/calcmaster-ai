@@ -7,6 +7,7 @@ import Math3DChart from '../components/Math3DChart';
 import { DashboardSkeleton } from '../components/SkeletonLoader';
 import * as math from 'mathjs';
 import katex from 'katex';
+import { useParams } from 'react-router-dom';
 import { 
   Play, 
   Trash2, 
@@ -19,7 +20,10 @@ import {
   CheckCircle2,
   Settings2,
   CornerDownLeft,
-  BookOpen
+  BookOpen,
+  Atom,
+  GraduationCap,
+  Sparkles
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -41,6 +45,7 @@ const LaTeX = ({ mathFormula, block = false }) => {
 
 const Dashboard = () => {
   const { saveToHistory } = useOperations();
+  const { workspaceId } = useParams();
   
   // Math States
   const [funcion, setFuncion] = useState('x^2 - 4*x + 3');
@@ -68,14 +73,65 @@ const Dashboard = () => {
 
   const inputRef = useRef(null);
 
+  // Workspace configuration specs
+  const workspaceDetails = useMemo(() => {
+    if (workspaceId === 'calculo-diferencial') {
+      return {
+        title: 'Cálculo Diferencial',
+        desc: 'Explora límites, tasas de cambio instantáneas y derivadas analíticas.',
+        icon: GraduationCap,
+        badgeColor: 'text-accent-blue bg-accent-blue/10 border-accent-blue/20',
+        defaultFormula: 'x^3 - 3*x + 1',
+        presets: [
+          { label: 'Polinomio Cúbico', formula: 'x^3 - 3*x + 1' },
+          { label: 'Campana Racional', formula: '1 / (x^2 + 1)' },
+          { label: 'Trigonométrica', formula: 'sin(x) / x' }
+        ]
+      };
+    }
+    if (workspaceId === 'fisica-matematica') {
+      return {
+        title: 'Física Matemática',
+        desc: 'Análisis de oscilaciones, ondas cuánticas y decaimientos exponenciales.',
+        icon: Atom,
+        badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+        defaultFormula: 'exp(-x^2) * cos(3*x)',
+        presets: [
+          { label: 'Paquete de Ondas', formula: 'exp(-x^2) * cos(3*x)' },
+          { label: 'Decaimiento Amortiguado', formula: 'exp(-x) * sin(2*x)' },
+          { label: 'Oscilador Armónico', formula: 'x^2 * cos(x)' }
+        ]
+      };
+    }
+    return {
+      title: 'Álgebra y Cálculo',
+      desc: 'Plataforma estándar para cálculos algebraicos generales y graficación.',
+      icon: Sparkles,
+      badgeColor: 'text-accent-purple bg-accent-purple/10 border-accent-purple/20',
+      defaultFormula: 'x^2 - 4*x + 3',
+      presets: [
+        { label: 'Parábola Básica', formula: 'x^2 - 4*x + 3' },
+        { label: 'Suma de Senos', formula: 'sin(x) + cos(2*x)' },
+        { label: 'Exponencial Simple', formula: 'exp(x) - x' }
+      ]
+    };
+  }, [workspaceId]);
+
+  // Update formula and reset results when workspace route changes
+  useEffect(() => {
+    setFuncion(workspaceDetails.defaultFormula);
+    setCalculated(false);
+    setResultado('');
+    setPasos([]);
+    setErrorCal('');
+  }, [workspaceId, workspaceDetails]);
+
   // Validate function when user types
   useEffect(() => {
-    // If we are in 3D graphing tab, we validate against variables x and y
-    const allowedVar = activeTab === 'grafica3d' ? 'y' : 'x';
     const val = validateFunction(funcion, 'x');
     
     if (activeTab === 'grafica3d') {
-      // Custom loose validation for 3D inputs to allow both x and y
+      // Loose validation to allow x and y for 3D graphs
       try {
         const node = math.parse(funcion);
         const symbols = [];
@@ -110,7 +166,7 @@ const Dashboard = () => {
     if (mode === 'grafica3d') {
       setFuncion('sin(x) * cos(y)');
     } else if (funcion === 'sin(x) * cos(y)') {
-      setFuncion('x^2 - 4*x + 3');
+      setFuncion(workspaceDetails.defaultFormula);
     }
   };
 
@@ -134,7 +190,7 @@ const Dashboard = () => {
     }
   }, [funcion, validation.isValid, activeTab, limiteInferior, limiteSuperior]);
 
-  // Insert symbol at current cursor position
+  // Insert symbol at cursor position
   const insertSymbol = (symbol) => {
     if (inputRef.current) {
       const start = inputRef.current.selectionStart;
@@ -168,10 +224,10 @@ const Dashboard = () => {
     if (!validation.isValid) return;
 
     setErrorCal('');
-    setIsLoading(true); // Trigger skeleton loading screen
+    setIsLoading(true);
     setCalculated(false);
 
-    // Simulate premium SaaS AI processing delay
+    // Simulated calculation delay (1s)
     setTimeout(async () => {
       try {
         if (activeTab === 'derivada') {
@@ -225,7 +281,7 @@ const Dashboard = () => {
       } finally {
         setIsLoading(false);
       }
-    }, 1000); // 1 second skeleton pulse loader
+    }, 1000);
   };
 
   const handleExportPDF = () => {
@@ -239,7 +295,6 @@ const Dashboard = () => {
     });
   };
 
-  // Math keyboard keys (includes x and y for 3D equations)
   const keyboardKeys = [
     { label: 'x', value: 'x' },
     { label: 'y', value: 'y' },
@@ -260,7 +315,6 @@ const Dashboard = () => {
     { label: ')', value: ')' },
   ];
 
-  // Convert standard math string to LaTeX for the result box
   const getLaTeXResult = (expr) => {
     try {
       return math.parse(expr).toTex({ parenthesis: 'keep' });
@@ -268,6 +322,8 @@ const Dashboard = () => {
       return expr;
     }
   };
+
+  const WorkspaceIcon = workspaceDetails.icon;
 
   return (
     <motion.div 
@@ -278,15 +334,21 @@ const Dashboard = () => {
       className="space-y-6"
     >
       
-      {/* SaaS Page Header */}
+      {/* SaaS Page Header (Contextual based on Workspace) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-5">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-white font-display">Playground Matemático</h2>
-          <p className="text-xs text-zinc-500">Diseña, deriva, integra y visualiza funciones con potencia de cálculo AI</p>
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-zinc-900 border border-white/5 rounded-xl text-slate-300">
+            <WorkspaceIcon className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-white font-display">{workspaceDetails.title}</h2>
+            <p className="text-xs text-zinc-500">{workspaceDetails.desc}</p>
+          </div>
         </div>
+        
         <div className="flex items-center space-x-2">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Motor Operativo Activo</span>
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Sincronizado</span>
         </div>
       </div>
 
@@ -295,6 +357,25 @@ const Dashboard = () => {
         
         {/* Core Math compiler console (Col span 2) */}
         <div className="lg:col-span-2 space-y-4">
+          
+          {/* Quick presets buttons */}
+          <div className="flex items-center space-x-2 overflow-x-auto pb-1 select-none">
+            <span className="text-[9px] font-bold text-zinc-500 tracking-wider uppercase shrink-0">Plantillas rápidas:</span>
+            {workspaceDetails.presets.map((preset) => (
+              <button
+                key={preset.label}
+                onClick={() => {
+                  setFuncion(preset.formula);
+                  setCalculated(false);
+                  setErrorCal('');
+                }}
+                className="px-2.5 py-1 text-[10px] rounded-lg border border-white/5 bg-zinc-950/40 hover:bg-zinc-900 text-zinc-400 hover:text-white transition cursor-pointer shrink-0"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
           <div className="saas-card p-6 bg-[#0a0a0f]/60 relative border border-white/5 overflow-hidden">
             
             {/* Ambient visual overlay decoration */}
@@ -302,7 +383,7 @@ const Dashboard = () => {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
               <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase">Expresión</span>
+                <span className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase">Fórmula de Entrada</span>
                 {funcion && (
                   validation.isValid ? (
                     <span className="flex items-center space-x-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
@@ -471,7 +552,7 @@ const Dashboard = () => {
               className="w-full flex items-center justify-between text-xs font-bold text-zinc-400 tracking-wider uppercase cursor-pointer"
             >
               <div className="flex items-center space-x-2">
-                <Settings2 className="h-4 w-4 text-accent-purple" />
+                <Settings2 className="h-4.5 w-4.5 text-accent-purple" />
                 <span>RANGO DE GRAFICACIÓN</span>
               </div>
               <span className="text-[10px] text-accent-blue hover:underline">Ajustar</span>
