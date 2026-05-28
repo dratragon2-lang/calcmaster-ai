@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+@theme {
+  --color-bg-dark: #09090b;
+  --color-bg-deep: #030303;
+  --color-card-dark: rgba(20, 20, 25, 0.45);
+  --color-accent-blue: #3b82f6;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-pink: #d946ef;
+}
+
+@layer base {
+  body {
+    background-color: #09090b;
+    color: #fafafa;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Smooth scrollbars */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
+  }
+}
+
+/* Custom CSS Redesign Utilities */
+
+/* SaaS Card - Linear Style */
+.saas-card {
+  background: rgba(18, 18, 24, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.saas-card:hover {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(22, 22, 30, 0.45);
+}
+
+.saas-card-glow-purple:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 30px -10px rgba(139, 92, 246, 0.15);
+}
+
+.saas-card-glow-blue:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 30px -10px rgba(59, 130, 246, 0.15);
+}
+
+/* Glassmorphism Input Field - Stripe Inspired */
+.saas-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  color: #f4f4f5;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.saas-input:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+/* Action button - Linear style */
+.saas-button-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px -5px rgba(139, 92, 246, 0.4);
+}
+
+.saas-button-primary:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px -4px rgba(139, 92, 246, 0.5);
+}
+
+.saas-button-primary:active {
+  transform: translateY(0px);
+}
+
+/* Secondary Button - Minimal */
+.saas-button-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e4e4e7;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.saas-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+/* Sidebar navigation item active style */
+.sidebar-item-active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulseSkeleton {
+  0%, 100% {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.03);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bg-glow-pulse {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+.animate-skeleton {
+  animation: pulseSkeleton 1.5s ease-in-out infinite;
+}
+
+/* Timeline Custom Styles */
+.timeline-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 50%, rgba(217, 70, 239, 0.05) 100%);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 20px;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #09090b;
+  border: 2px solid #3b82f6;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.timeline-item:hover .timeline-dot {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+}
+
+/* Form math equation display rendering fixes */
+.katex-display {
+  margin: 0.5em 0 !important;
+}
+.katex {
+  font-size: 1.1em;
+}
