@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CalcMaster AI 🧪🔢
 
 CalcMaster AI es una aplicación web moderna y profesional diseñada para resolver cálculos matemáticos complejos, incluyendo **derivadas simbólicas** e **integrales definidas**, mostrando explicaciones paso a paso detalladas, graficando funciones de forma interactiva y permitiendo a los usuarios almacenar su historial de operaciones y exportar reportes en PDF.
@@ -96,3 +97,7 @@ Prueba ingresar las siguientes fórmulas en la interfaz para verificar el sistem
 *   Trigonométricas: `sin(x) * cos(x)`
 *   Compuestas: `exp(-x^2)` (Campana de Gauss)
 *   Integrales definidas racionales: `1 / (x^2 + 1)` en el intervalo `[0, 1]` (cuyo resultado es aproximadamente $\pi/4 \approx 0.785398$).
+=======
+# calcmaster-ai
+Sistema inteligente para el cálculo, análisis y visualización de operaciones matemáticas avanzadas.
+>>>>>>> b3839db219bac472f36a0c94adf05297dd71fc94
