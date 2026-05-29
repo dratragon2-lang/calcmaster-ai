@@ -12,11 +12,10 @@ const deriveExpression = async (req, res) => {
             });
         }
 
+        const mathServiceUrl = process.env.MATH_SERVICE_URL || "http://127.0.0.1:5001";
         const response = await axios.post(
-            "http://127.0.0.1:5001/derive",
-            {
-                expression
-            }
+            `${mathServiceUrl}/derive`,
+            { expression }
         );
 
         return res.json(response.data);

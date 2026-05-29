@@ -18,7 +18,7 @@ const MathSolver = () => {
     setError(null);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/math/derive",
+        `${import.meta.env.VITE_MATH_SERVICE_URL}/derive`,
         { expression },
         { headers: { "Content-Type": "application/json" } }
       );
