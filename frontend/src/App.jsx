@@ -9,6 +9,7 @@ import History from './pages/History';
 import Settings from './pages/Settings';
 import { Menu, Cpu } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
+import MathSolver from "./components/MathSolver";
 
 // Router guard for authenticated routes
 const ProtectedRoute = ({ children }) => {
@@ -89,6 +90,14 @@ function AppContent() {
                     <Settings />
                   </ProtectedRoute>
                 } 
+              />
+              <Route
+                path="/math"
+                element={
+                  <ProtectedRoute>
+                  <MathSolver />
+                  </ProtectedRoute>
+                }
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
